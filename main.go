@@ -37,8 +37,9 @@ func main() {
 			panic(err)
 		}
 
-		r := getRouter(db)
+		r := getRouter(db, nil) // Quick fix for build by adding nil
 		log.Fatal(http.ListenAndServe(":8080", r))
+		return err
 	}
 
 	app.Run(os.Args)

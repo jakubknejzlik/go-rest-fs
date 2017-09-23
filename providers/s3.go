@@ -1,10 +1,13 @@
 package providers
 
 import (
+	"context"
 	"io"
 
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
 
 // S3StorageProvider ...
@@ -22,14 +25,14 @@ func NewS3StorageProvider(bucket string) *S3StorageProvider {
 
 // UploadFile ...
 func (p *S3StorageProvider) UploadFile(r io.ReadCloser, name string) error {
-	// implement this using s3manager.Uploader()
+	ctx := context.Background()
+	uploader := s3manager.NewUploaderWithClient(p.S3)
 
-	// ctx := context.Background()
-	// _, err := p.S3.PutObjectWithContext(ctx, &s3.PutObjectInput{
-	// 	Bucket: aws.String(p.Bucket),
-	// 	Key:    aws.String(name),
-	// 	Body:   r,
-	// })
-	// return err
-	return nil
+	_, err := uploader.UploadWithContext(ctx, &s3manager.UploadInput{
+		Bucket: aws.String(p.Bucket),
+		Key:    aws.String(name),
+		Body:   r,
+	})
+
+	return err
 }

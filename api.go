@@ -22,7 +22,7 @@ func uploadFile(db *gorm.DB, p providers.StorageProvider) func(w http.ResponseWr
 		vars := mux.Vars(r)
 		name := vars["name"]
 		data := r.Body
-		if err := p.UploadFile(r, name); err != nil {
+		if err := p.UploadFile(data, name); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 		}
 	}
