@@ -8,6 +8,7 @@ import (
 // StorageProvider ...
 type StorageProvider interface {
 	UploadFile(r io.ReadCloser, name string) error
+	DeleteFile(name string) error
 }
 
 // GetProvider ...

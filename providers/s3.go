@@ -36,3 +36,13 @@ func (p *S3StorageProvider) UploadFile(r io.ReadCloser, name string) error {
 
 	return err
 }
+
+// DeleteFile ...
+func (p *S3StorageProvider) DeleteFile(name string) error {
+	params := &s3.DeleteObjectInput{
+		Bucket: aws.String(p.Bucket),
+		Key:    aws.String(name),
+	}
+	_, err := p.S3.DeleteObject(params)
+	return err
+}
