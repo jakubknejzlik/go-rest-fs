@@ -23,14 +23,15 @@ func uploadFile(db *gorm.DB, p providers.StorageProvider) func(w http.ResponseWr
 		vars := mux.Vars(r)
 		name := vars["name"]
 		data := r.Body
+		if r.ContentLength < 1 {
+			http.Error(w, "ContentLength is not set!", http.StatusBadRequest)
+		}
+
 		if err := p.UploadFile(data, name); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 		}
-		var tmp []byte
-		data.Read(tmp)
-		data.Close()
-		size := uint(len(tmp))
-		if err := model.CreateFileInDB(db, name, size); err != nil {
+
+		if err := model.CreateFileInDB(db, name, uint(r.ContentLength)); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 		}
 	}
