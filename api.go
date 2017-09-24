@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"os"
 
 	"./model"
 	"./providers"
@@ -51,15 +52,27 @@ func uploadFile(db *gorm.DB, p providers.StorageProvider) func(w http.ResponseWr
 		name := vars["name"]
 		data := r.Body
 
-		if r.ContentLength < 1 {
-			http.Error(w, "ContentLength is not set!", http.StatusBadRequest)
+		_, h, err := r.FormFile("file")
+		if err != nil {
+			http.Error(w, "Content is not provided!", http.StatusBadRequest)
+			return
+		}
+
+		var size int64
+		mfile, _ := h.Open()
+		switch t := mfile.(type) {
+		case *os.File:
+			fi, _ := t.Stat()
+			size = fi.Size()
+		default:
+			size, _ = mfile.Seek(0, 0)
 		}
 
 		if err := p.UploadFile(data, name); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 		}
 
-		if err := model.CreateFileInDB(db, name, uint(r.ContentLength)); err != nil {
+		if err := model.CreateFileInDB(db, name, uint(size)); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 		}
 	}
