@@ -27,11 +27,7 @@ func (p *FileStorageProvider) UploadFile(r io.ReadCloser, name string) error {
 	return err
 }
 
-// UploadFile ...
+// DeleteFile ...
 func (p *FileStorageProvider) DeleteFile(name string) error {
-	err := os.Remove(name)
-	if err != nil {
-		return err
-	}
-	return err
+	return os.Remove(name)
 }

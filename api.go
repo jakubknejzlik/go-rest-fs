@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 
 	"./model"
@@ -51,7 +50,7 @@ func uploadFile(db *gorm.DB, p providers.StorageProvider) func(w http.ResponseWr
 		vars := mux.Vars(r)
 		name := vars["name"]
 		data := r.Body
-		fmt.Println(r.ContentLength)
+
 		if r.ContentLength < 1 {
 			http.Error(w, "ContentLength is not set!", http.StatusBadRequest)
 		}
