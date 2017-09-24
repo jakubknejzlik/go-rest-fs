@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 
+	"./model"
 	"github.com/gorilla/mux"
 	"github.com/jakubknejzlik/go-rest-fs/providers"
 	"github.com/jinzhu/gorm"
@@ -23,6 +24,13 @@ func uploadFile(db *gorm.DB, p providers.StorageProvider) func(w http.ResponseWr
 		name := vars["name"]
 		data := r.Body
 		if err := p.UploadFile(data, name); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		}
+		var tmp []byte
+		data.Read(tmp)
+		data.Close()
+		size := uint(len(tmp))
+		if err := model.CreateFileInDB(db, name, size); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 		}
 	}
