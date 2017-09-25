@@ -25,9 +25,15 @@ func deleteFile(db *gorm.DB, p providers.StorageProvider) func(w http.ResponseWr
 		name := vars["name"]
 		file := model.File{}
 		err := db.Where("name = ?", name).First(&file).Error
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusNotFound)
+
+		// Return 404 if file not found in DB
+		if err == gorm.ErrRecordNotFound {
+			http.Error(w, "File not found!", http.StatusNotFound)
 			return
+		}
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
 		}
 
 		if err := p.DeleteFile(name); err != nil {
